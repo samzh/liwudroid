@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -74,7 +76,9 @@ public class HttpsConnectionUtils {
 
 			httpClient = WebClientWraper.wrapClient(new DefaultHttpClient());
 
-			HttpGet httpGet = new HttpGet(POST_PATH);
+			Uri postUri = Uri.parse(POST_PATH);
+			
+			HttpGet httpGet = new HttpGet(postUri.getPath());
 
 			httpGet.setHeader("User-Agent",
 					"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.32 Safari/535.1");
@@ -82,17 +86,12 @@ public class HttpsConnectionUtils {
 			httpGet.setHeader("Host", "www.253874.com");
 			httpGet.setHeader("Connection", "keep-alive");
 			httpGet.setHeader("Cookie", aspSessionId);
-			HttpResponse listResponse = httpClient.execute(httpGet);
+			
+			System.out.println ("SET POST HEADER OK");
+			HttpResponse listResponse = httpClient.execute(host, httpGet);
+			System.out.println ("GET POST EXECUTED");
 
-			// Header[] headers = resp.getAllHeaders();
-			//
-			// for (int i = 0; i < headers.length; i++) {
-			// Header h = headers[i];
-			// System.out.println("Name : " + h.getName());
-			// System.out.println("Value: " + h.getValue());
-			// }
-
-			if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+			if (listResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 				InputStream is1 = listResponse.getEntity().getContent();
 
 				final char[] buffer1 = new char[0x10000];
@@ -105,9 +104,9 @@ public class HttpsConnectionUtils {
 						out1.append(buffer1, 0, read1);
 					}
 				} while (read1 >= 0);
-				System.out.println("---------list------------");
-				System.out.println(out1.toString());
-				System.out.println("--------------------------");
+//				System.out.println("---------list------------");
+//				System.out.println(out1.toString());
+//				System.out.println("--------------------------");
 				httpClient.getConnectionManager().shutdown();
 			}
 
@@ -116,6 +115,26 @@ public class HttpsConnectionUtils {
 		}
 
 		return out1.toString();
+	}
+	
+	public String[] processList(String contentString) {
+		Pattern listPattern = Pattern.compile("◆ <a href='.+?' title='.+?'.*>.*</a><br>");
 
+		Matcher matches = listPattern.matcher(contentString);
+
+		while (matches.find()) {
+			String content = matches.group();
+
+			String[] list = content.split("<br>");
+			
+//			List<String> rtnList = new ArrayList<String>();
+
+//			for (String aPost : list) {
+//				System.out.println(aPost);
+//			}
+			return list;
+		}
+
+		return null;
 	}
 }

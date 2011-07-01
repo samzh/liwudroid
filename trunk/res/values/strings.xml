@@ -4,7 +4,8 @@
     <string name="app_name">Liwu</string>
     <string name="title">里屋！</string>
     <string name="username">用户：</string>
-    <string name="strLoginLabel">用户名</string>
-    <string name="strPwdLabel">密码</string>
-    <string name="strBtnLogin">插入</string>
+    <string name="str_login_label">用户名</string>
+    <string name="str_pwd_label">密码</string>
+    <string name="str_btn_login">插入</string>
+    <string name="empty"></string>
 </resources>

@@ -33,7 +33,7 @@ public class WebClientWraper {
 				}
 
 				public X509Certificate[] getAcceptedIssuers() {
-					return null;
+					return new X509Certificate[] {};
 				}
 			};
 			ctx.init(null, new TrustManager[] { tm }, new SecureRandom());
@@ -50,7 +50,7 @@ public class WebClientWraper {
 
 			ClientConnectionManager ccm = base.getConnectionManager();
 			SchemeRegistry sr = ccm.getSchemeRegistry();
-			sr.register(new Scheme("https", ssf, 443));
+			sr.register(new Scheme("https", new CustomSSLSocketFactory(), 443));
 
 			DefaultHttpClient newClient = new DefaultHttpClient(ccm, base.getParams());
 
@@ -63,10 +63,11 @@ public class WebClientWraper {
 						int responseCode = response.getStatusLine().getStatusCode();
 						if (responseCode == HttpStatus.SC_MOVED_PERMANENTLY
 								|| responseCode == HttpStatus.SC_MOVED_TEMPORARILY) {
+							System.out.println("Redirect:" + responseCode);
 							return true;
 						}
 					}
-					return false;
+					return isRedirect;
 				}
 			});
 			return newClient;
