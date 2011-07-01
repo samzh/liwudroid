@@ -1,29 +1,23 @@
 package com.samzh.liwu;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.ServiceConnection;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 
 import com.samzh.liwu.http.HttpsConnectionUtils;
-import com.samzh.liwu.service.LoginService;
 
 public class LoginMain extends Activity {
 	/** Called when the activity is first created. */
-
-	private LoginService loginService;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		Button btnLogin = (Button) findViewById(R.id.btnLogin);
+		Button btnLogin = (Button) findViewById(R.id.btn_login);
 
 		btnLogin.setOnClickListener(new OnClickListener() {
 			@Override
@@ -32,37 +26,29 @@ public class LoginMain extends Activity {
 			}
 		});
 
-		//this.bindService(new Intent("com.samzh.liwu.service.LoginService"), this.serviceConnection, BIND_AUTO_CREATE);
+		// this.bindService(new Intent("com.samzh.liwu.service.LoginService"),
+		// this.serviceConnection, BIND_AUTO_CREATE);
 	}
-	
+
 	@Override
 	public void onDestroy() {
-		this.unbindService(serviceConnection);        
-        super.onDestroy(); 
+		super.onDestroy();
 	}
 
 	private void login() {
-		String username = ((EditText) findViewById(R.id.textLogin)).getText().toString();
-		
+
 		HttpsConnectionUtils util = new HttpsConnectionUtils();
-		String ret = util.login();
-		System.out.println(ret);
-		
+		String content = util.login();
+		String[] postList = util.processList(content);
+
+		Bundle bundle = new Bundle();
+		bundle.putStringArray("postList", postList);
+		Intent intent = new Intent();
+
+		intent.putExtras(bundle);
+		intent.setClass(LoginMain.this, ListPost.class);
+		startActivity(intent);
+
 	}
 
-	private ServiceConnection serviceConnection = new ServiceConnection() {
-
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			loginService = null;
-		}
-
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			loginService = (LoginService) service;
-
-			loginService.login();
-
-		}
-	};
 }

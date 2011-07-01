@@ -10,7 +10,7 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".ListPost" android:label="">
+		<activity android:label="@string/app_name" android:name="ListPost">
 		</activity>
 	</application>
 	<uses-permission android:name="android.permission.INTERNET" />
