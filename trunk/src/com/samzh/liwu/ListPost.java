@@ -15,12 +15,12 @@ public class ListPost extends Activity {
 
 		String[] postList = bundle.getStringArray("postList");
 
-		ListView listView = (ListView) findViewById(R.id.post_list);
+		ListView listView = new ListView(this);
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.id.post_list, postList);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.list_post, postList);
 		listView.setAdapter(adapter);
 
-		setContentView(R.layout.list_post);
+		setContentView(listView);
 
 	}
 

@@ -39,15 +39,19 @@ public class LoginMain extends Activity {
 
 		HttpsConnectionUtils util = new HttpsConnectionUtils();
 		String content = util.login();
-		String[] postList = util.processList(content);
 
-		Bundle bundle = new Bundle();
-		bundle.putStringArray("postList", postList);
-		Intent intent = new Intent();
+		if (content != null && content.length() > 0) {
+			String[] postList = util.processList(content);
 
-		intent.putExtras(bundle);
-		intent.setClass(LoginMain.this, ListPost.class);
-		startActivity(intent);
+			Bundle bundle = new Bundle();
+			bundle.putStringArray("postList", postList);
+			Intent intent = new Intent();
+
+			intent.putExtras(bundle);
+			intent.setClass(LoginMain.this, ListPost.class);
+			startActivity(intent);
+
+		}
 
 	}
 
