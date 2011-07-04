@@ -1,12 +1,6 @@
 package com.samzh.liwu.http;
 
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import java.security.KeyStore;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -23,34 +17,17 @@ public class WebClientWraper {
 
 	public static HttpClient wrapClient(HttpClient base) {
 		try {
-			SSLContext ctx = SSLContext.getInstance("TLS");
-			X509TrustManager tm = new X509TrustManager() {
 
-				public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
-				}
+			KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			trustStore.load(null, null);
 
-				public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
-				}
+			SSLSocketFactory ssf = new CustomSSLSocketFactory(trustStore);
 
-				public X509Certificate[] getAcceptedIssuers() {
-					return new X509Certificate[] {};
-				}
-			};
-			ctx.init(null, new TrustManager[] { tm }, new SecureRandom());
-			// SSLSocketFactory ssf = new SSLSocketFactory(ctx,
-			// SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-			//
-			// ClientConnectionManager ccm = base.getConnectionManager();
-			// SchemeRegistry sr = ccm.getSchemeRegistry();
-			// sr.register(new Scheme("https", 443, ssf));
-
-			SSLSocketFactory ssf = (SSLSocketFactory) base.getConnectionManager().getSchemeRegistry()
-					.getScheme("https").getSocketFactory();
 			ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
 			ClientConnectionManager ccm = base.getConnectionManager();
 			SchemeRegistry sr = ccm.getSchemeRegistry();
-			sr.register(new Scheme("https", new CustomSSLSocketFactory(), 443));
+			sr.register(new Scheme("https", ssf, 443));
 
 			DefaultHttpClient newClient = new DefaultHttpClient(ccm, base.getParams());
 
