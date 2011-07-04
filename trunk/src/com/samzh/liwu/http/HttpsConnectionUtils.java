@@ -3,10 +3,15 @@ package com.samzh.liwu.http;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -19,8 +24,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 import android.net.Uri;
+
+import com.samzh.liwu.xml.PostHandler;
 
 public class HttpsConnectionUtils {
 	public static final String LOGIN_PATH = "https://www.253874.com/inyourname.asp";
@@ -29,11 +38,17 @@ public class HttpsConnectionUtils {
 
 	private static String aspSessionId = "";
 
+	private static SAXParserFactory factory = SAXParserFactory.newInstance();
+
+	private static SAXParser parser;
+
+	private static XMLReader xmlreader;
+
 	public String login() {
 		HttpClient httpClient = new DefaultHttpClient();
-		
+
 		Uri uri = Uri.parse(LOGIN_PATH);
-		
+
 		HttpHost host = new HttpHost(uri.getHost(), 443, uri.getScheme());
 		HttpGet get = new HttpGet(uri.getPath());
 		HttpPost httppost = new HttpPost(uri.getPath());
@@ -77,7 +92,7 @@ public class HttpsConnectionUtils {
 			httpClient = WebClientWraper.wrapClient(new DefaultHttpClient());
 
 			Uri postUri = Uri.parse(POST_PATH);
-			
+
 			HttpGet httpGet = new HttpGet(postUri.getPath());
 
 			httpGet.setHeader("User-Agent",
@@ -86,10 +101,10 @@ public class HttpsConnectionUtils {
 			httpGet.setHeader("Host", "www.253874.com");
 			httpGet.setHeader("Connection", "keep-alive");
 			httpGet.setHeader("Cookie", aspSessionId);
-			
-			System.out.println ("SET POST HEADER OK");
+
+			System.out.println("SET POST HEADER OK");
 			HttpResponse listResponse = httpClient.execute(host, httpGet);
-			System.out.println ("GET POST EXECUTED");
+			System.out.println("GET POST EXECUTED");
 
 			if (listResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 				InputStream is1 = listResponse.getEntity().getContent();
@@ -104,9 +119,9 @@ public class HttpsConnectionUtils {
 						out1.append(buffer1, 0, read1);
 					}
 				} while (read1 >= 0);
-//				System.out.println("---------list------------");
-//				System.out.println(out1.toString());
-//				System.out.println("--------------------------");
+				// System.out.println("---------list------------");
+				// System.out.println(out1.toString());
+				// System.out.println("--------------------------");
 				httpClient.getConnectionManager().shutdown();
 			}
 
@@ -116,7 +131,7 @@ public class HttpsConnectionUtils {
 
 		return out1.toString();
 	}
-	
+
 	public String[] processList(String contentString) {
 		Pattern listPattern = Pattern.compile("◆ <a href='.+?' title='.+?'.*>.*</a><br>");
 
@@ -126,15 +141,48 @@ public class HttpsConnectionUtils {
 			String content = matches.group();
 
 			String[] list = content.split("<br>");
-			
-//			List<String> rtnList = new ArrayList<String>();
 
-//			for (String aPost : list) {
-//				System.out.println(aPost);
-//			}
+			// List<String> rtnList = new ArrayList<String>();
+
+			for (String aPost : list) {
+				System.out.println(aPost);
+			}
 			return list;
 		}
 
 		return null;
+	}
+
+	public List<Map<String, String>> processAPost(String contentString) {
+
+		String source = "◆ <a href='info2.asp?id=206307' title='【2011-7-5 0:30:19 玻璃围棋【<font color=#1E90FF>小猪 我等你慢慢长大</font>】】'><font color='#DC143C'>帝都“拉链星区”完美结束 开始上照片了 【501st】</font> (49)</a>";
+		try {
+
+			source = source.substring(source.indexOf("◆ ")+1);
+			parser = factory.newSAXParser();
+
+			xmlreader = parser.getXMLReader();
+			
+			source = new String(source.getBytes(), "UTF-8");
+			
+			StringReader read = new StringReader(source);
+
+			InputSource is = new InputSource(read);
+			PostHandler handler = new PostHandler();
+			xmlreader.setContentHandler(handler);
+			xmlreader.parse(is);
+
+			List<Map<String, String>> postList = handler.getPostList();
+			for (Map<String, String> map : postList) {
+				System.out.println("href:" + map.get("href"));
+				System.out.println("title:" + map.get("title"));
+				System.out.println("--------------------------");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+
 	}
 }

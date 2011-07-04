@@ -42,6 +42,8 @@ public class LoginMain extends Activity {
 
 		if (content != null && content.length() > 0) {
 			String[] postList = util.processList(content);
+			
+			util.processAPost(content);
 
 			Bundle bundle = new Bundle();
 			bundle.putStringArray("postList", postList);
