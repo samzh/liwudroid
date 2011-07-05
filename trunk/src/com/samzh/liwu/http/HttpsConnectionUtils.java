@@ -114,8 +114,12 @@ public class HttpsConnectionUtils {
 	public String getPost(String url) {
 		HttpClient httpClient = new DefaultHttpClient();
 
+		url = "https://www.253874.com/new/info2.asp?id=209699";
+		
+		System.out.println (url);
+		
+		
 		Uri uri = Uri.parse(url);
-
 		HttpHost host = new HttpHost(uri.getHost(), 443, uri.getScheme());
 		HttpGet get = new HttpGet(uri.getPath());
 		StringBuilder out1 = new StringBuilder();
@@ -123,9 +127,15 @@ public class HttpsConnectionUtils {
 			httpClient = WebClientWraper.wrapClient(httpClient);
 			get.setHeader("User-Agent",
 			"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.32 Safari/535.1");
-			get.setHeader("Content-Type", "text/html");
 			get.setHeader("Referer", Constant.POST_INFO);
-			get.setHeader("Cookie", aspSessionId);
+//			get.setHeader("Cookie", aspSessionId);
+			get.setHeader("Host", Constant.HOST);
+			get.setHeader("Connection", "keep-alive");
+			get.setHeader("Accept-Charset", "GBK,utf-8;q=0.7,*;q=0.3");
+			get.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+			get.setHeader("Cookie", "ASPSESSIONIDSSBCSBTR=PDJBDJJBNFKKEKFLIAAJOEEG; affixa=name=samzh; sunyanzi=mdd=1f79c4106fa5367e2194bfe5943888a2&xxx=3c3a9790287cc4b48667b7ca0578c057&uid=samzh; lastck=ckid=208748%2C208668%2C208687%2C208672%2C208771%2C208729%2C208638%2C209664%2C209605%2C209568%2C208838%2C209552%2C209696%2C209696%2C209696%2C");
+			
+//			System.out.println("Cookie: " + aspSessionId);
 			HttpResponse response = httpClient.execute(host, get);
 			
 			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
@@ -141,12 +151,17 @@ public class HttpsConnectionUtils {
 						out1.append(buffer1, 0, read1);
 					}
 				} while (read1 >= 0);
-				httpClient.getConnectionManager().shutdown();
+				
+			} else {
+				out1.append(response.getStatusLine().getStatusCode());
+				out1.append(response.getStatusLine().getReasonPhrase());
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally  {
+			httpClient.getConnectionManager().shutdown();
 		}
+		
 
 		return out1.toString();
 	}

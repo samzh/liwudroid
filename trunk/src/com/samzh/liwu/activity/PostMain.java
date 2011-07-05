@@ -2,10 +2,11 @@ package com.samzh.liwu.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.webkit.WebView;
 
 import com.samzh.liwu.R;
+import com.samzh.liwu.http.HttpsConnectionUtils;
+import com.samzh.liwu.util.Constant;
 
 public class PostMain extends Activity {
 
@@ -17,14 +18,16 @@ public class PostMain extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_main);
-		String dataBase = "https://www.253874.com/new/";
+		HttpsConnectionUtils utils = new HttpsConnectionUtils();
+
 		Bundle bundle = this.getIntent().getExtras();
 		String href = bundle.getString("href");
+
+		String content = utils.getPost(Constant.POST_MAIN_PREFIX + href);
 		try {
 			WebView view = (WebView) findViewById(R.id.webview_post_main);
-			Log.v(PostMain.class.getSimpleName(), dataBase + href);
-			view.loadData(dataBase + href, mimeType, encoding);
-			
+			view.loadData(content, mimeType, encoding);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
