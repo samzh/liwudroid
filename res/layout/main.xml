@@ -6,7 +6,7 @@
     android:visibility="visible">
     <TextView android:layout_width="fill_parent" android:id="@+id/title" android:text="@string/title" android:layout_gravity="center" android:layout_height="wrap_content" android:gravity="center|center_horizontal"></TextView>
     <TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/login_label" android:text="@string/str_login_label"></TextView>
-    <EditText android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/text_login" android:text="@string/str_login_label"></EditText>
+    <EditText android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/text_login" android:text="@string/empty"></EditText>
     <TextView android:layout_width="fill_parent" android:id="@+id/pwd_label" android:layout_height="wrap_content" android:text="@string/str_pwd_label"></TextView>
     <EditText android:layout_width="fill_parent" android:layout_height="wrap_content" android:password="true" android:id="@+id/text_pwd" android:text=""></EditText>
     <Button android:id="@+id/btn_login" android:layout_height="wrap_content" android:text="@string/str_btn_login" android:layout_width="100dip" android:gravity="center"></Button>
