@@ -1,4 +1,4 @@
-package com.samzh.liwu;
+package com.samzh.liwu.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,9 +7,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.samzh.liwu.R;
+import com.samzh.liwu.helper.PostHelper;
 import com.samzh.liwu.http.HttpsConnectionUtils;
 
-public class LoginMain extends Activity {
+public class Login extends Activity {
 	/** Called when the activity is first created. */
 
 	@Override
@@ -41,16 +43,14 @@ public class LoginMain extends Activity {
 		String content = util.login();
 
 		if (content != null && content.length() > 0) {
-			String[] postList = util.processList(content);
+			String[] postList = PostHelper.processList(content);
 			
-			util.processAPost(content);
-
 			Bundle bundle = new Bundle();
 			bundle.putStringArray("postList", postList);
 			Intent intent = new Intent();
 
 			intent.putExtras(bundle);
-			intent.setClass(LoginMain.this, ListPost.class);
+			intent.setClass(Login.this, PostList.class);
 			startActivity(intent);
 
 		}
