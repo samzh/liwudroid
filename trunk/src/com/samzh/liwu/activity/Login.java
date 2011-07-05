@@ -40,7 +40,7 @@ public class Login extends Activity {
 	private void login() {
 
 		HttpsConnectionUtils util = new HttpsConnectionUtils();
-		String content = util.login();
+		String content = util.login("samzh", "samuel");
 
 		if (content != null && content.length() > 0) {
 			String[] postList = PostHelper.processList(content);
